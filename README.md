@@ -1,5 +1,5 @@
 # docker-local
-### Gardyn, Inc. specific docker-powered WordPress local dev tool
+### docker-powered WordPress local dev tool
 
 ## Requirements
 
@@ -13,7 +13,7 @@
 ## Steps
 
 1. Set up a directory you want you project to live in.
-1. From within that dir clone the github project: `jessegardyn/docker-local`, or with `degit`, run: `degit jessegardyn/docker.local myprojectdir`
+1. From within that dir clone the github project: `/docker-local`, or with `degit`, run: `degit /docker.local myprojectdir`
 1. This will create a project with this structure:
 ```
 - myprojectdir
@@ -56,7 +56,7 @@ then run these commands in order and as three commands (changing your name and e
 
 ```
 INSERT INTO wp_users (user_login, user_pass, user_nicename, user_email, user_status, user_registered)
-VALUES ('localadmin', MD5('pass123'), 'YOUR NAME', 'EMAIL@gardyn.tech', 0, NOW());
+VALUES ('localadmin', MD5('pass123'), 'YOUR NAME', 'EMAIL@domain.com', 0, NOW());
 
 INSERT INTO wp_usermeta (umeta_id, user_id, meta_key, meta_value)
 VALUES (NULL, (Select max(id) FROM wp_users), 'wp_capabilities', 'a:1:{s:13:"administrator";s:1:"1";}');
