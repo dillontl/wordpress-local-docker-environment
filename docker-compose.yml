@@ -1,0 +1,45 @@
+version: '3.9'
+
+services: # configuring each container
+  db: # name of our mysql container
+    image: mysql:5.7 # which image to pull, in this case specifying v. 5.7
+    command: --max_allowed_packet=6G      # Big db!
+    volumes: # data to map to the container
+      - ./data:/docker-entrypoint-initdb.d # looks for sql file to use, can't be compressed apparently
+    restart: always # always restart the container after reboot
+    environment: # environment variables -- mysql options in this case
+      MYSQL_ROOT_PASSWORD: wordpress
+      MYSQL_DATABASE: wordpress
+      MYSQL_USER: wordpress
+      MYSQL_PASSWORD: wordpress
+
+  wordpress: # name of our wordpress container
+    env_file:
+      - .env
+    depends_on: # container dependencies that need to be running first
+      - db
+    image: wordpress:latest # image used by our container
+    ports:
+      - "8080:80" # setting our ports for networking
+    restart: always
+    environment:
+      WORDPRESS_DB_HOST: db # default mysql port
+      WORDPRESS_DB_USER: wordpress
+      WORDPRESS_DB_PASSWORD: wordpress # matches the password set in the db container
+      WORDPRESS_TABLE_PREFIX: ${TABLE_PREFIX}
+      WORDPRESS_CONFIG_EXTRA: |
+        define('WP_HOME', '${WP_HOME}');
+        define('WP_SITEURL', '${WP_SITEURL}');
+        define('WP_ENV', '${WP_ENV}');
+        define('FS_METHOD', '${FS_METHOD}');
+    volumes: # this is where we tell Docker what to pay attention to
+      - ./site/gardyn-website/${SITE_THEME}:/var/www/html/wp-content/themes/${SITE_THEME} # mapping our custom theme to the container
+      - ./site/gardyn-website/${SITE_THEME_PARENT}:/var/www/html/wp-content/themes/${SITE_THEME_PARENT} # mapping our custom theme to the container
+      - ./site/plugins:/var/www/html/wp-content/plugins # map our plugins to the container
+      ## if you need to hold all of WP in the repo or it's just set up that way, comment out the above and uncomment below:
+      #- ./site:/var/www/html
+      ## keep uploads separated
+      - ./data/uploads:/var/www/html/wp-content/uploads # map our uploads to the container
+
+volumes: # persist the data for local dev
+  db_data:
